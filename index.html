@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta name="theme-color" content="#1a1a2e">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Fire Emblem">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -13,71 +12,66 @@
 <title>火焰纹章 · 战棋</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a1a2e;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:"Microsoft YaHei","PingFang SC",sans-serif}
-#game{display:flex;gap:12px;align-items:flex-start}
-#canvasWrap{position:relative}
-canvas{border:3px solid #8b6914;border-radius:4px;cursor:pointer;display:block}
-#panel{width:280px;background:linear-gradient(180deg,#2c1810,#1a0e08);border:2px solid #8b6914;border-radius:6px;padding:14px;color:#e0d5c0;display:flex;flex-direction:column;gap:10px;min-height:640px}
-#panel h2{text-align:center;font-size:16px;color:#ffd700;border-bottom:1px solid #8b6914;padding-bottom:8px;margin-bottom:4px}
-#turnInd{text-align:center;padding:8px;border-radius:4px;font-weight:700;font-size:14px}
-#turnInd.player{background:#1a4a1a;color:#4cff4c;border:1px solid #2a8a2a}
-#turnInd.enemy{background:#4a1a1a;color:#ff4c4c;border:1px solid #8a2a2a}
-#unitInfo{background:rgba(0,0,0,.3);border-radius:4px;padding:10px;font-size:12px;line-height:1.8;min-height:120px}
-#unitInfo .name{font-size:15px;font-weight:700;color:#ffd700}
-#unitInfo .stat{display:inline-block;width:48%}
-#unitInfo .label{color:#a09080}
-#logBox{background:rgba(0,0,0,.4);border-radius:4px;padding:10px;font-size:11px;line-height:1.6;flex:1;overflow-y:auto;max-height:200px;color:#c0b090}
-#logBox .logGood{color:#4cff4c}
-#logBox .logBad{color:#ff6b6b}
-#logBox .logInfo{color:#ffd700}
-.btnRow{display:flex;gap:8px}
-.btn{flex:1;padding:10px 8px;border:2px solid #8b6914;border-radius:4px;background:#3c2a14;color:#ffd700;font-weight:700;font-size:13px;cursor:pointer;transition:.15s}
-.btn:hover{background:#5a3a1a;border-color:#b8902a}
-.btn:active{background:#2a1a08}
-.btn.danger{background:#4a1a1a;border-color:#8a2a2a;color:#ff6b6b}
-.btn.danger:hover{background:#6a2a2a}
-.btn.heal{background:#1a4a1a;border-color:#2a8a2a;color:#4cff4c}
+body{background:#0d0d1a;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:"Microsoft YaHei","PingFang SC",sans-serif;image-rendering:pixelated}
+#game{display:flex;gap:10px;align-items:flex-start}
+canvas{border:3px solid #6b4a1a;border-radius:2px;cursor:crosshair;display:block;image-rendering:pixelated;image-rendering:crisp-edges}
+#panel{width:270px;background:linear-gradient(180deg,#1a1008,#0d0604);border:2px solid #6b4a1a;border-radius:4px;padding:12px;color:#c8b898;display:flex;flex-direction:column;gap:8px;min-height:640px;font-size:12px}
+#panel h2{text-align:center;font-size:15px;color:#ffd700;border-bottom:1px solid #6b4a1a;padding-bottom:6px;margin-bottom:2px;letter-spacing:2px}
+#turnInd{text-align:center;padding:8px;border-radius:3px;font-weight:700;font-size:13px;letter-spacing:1px}
+#turnInd.player{background:#0a2a0a;color:#4cff4c;border:1px solid #1a5a1a}
+#turnInd.enemy{background:#2a0a0a;color:#ff4c4c;border:1px solid #5a1a1a}
+#unitInfo{background:rgba(0,0,0,.35);border-radius:3px;padding:8px;font-size:11px;line-height:1.7;min-height:100px}
+#unitInfo .name{font-size:14px;font-weight:700;color:#ffd700}
+#unitInfo .stat{display:inline-block;width:48%;font-size:11px}
+#unitInfo .label{color:#8a7870}
+#logBox{background:rgba(0,0,0,.45);border-radius:3px;padding:8px;font-size:10px;line-height:1.6;flex:1;overflow-y:auto;max-height:180px;color:#a09078}
+#logBox .logGood{color:#4cff4c}#logBox .logBad{color:#ff6b6b}#logBox .logInfo{color:#ffd700}
+.btnRow{display:flex;gap:6px}
+.btn{flex:1;padding:8px 6px;border:2px solid #6b4a1a;border-radius:3px;background:#261810;color:#ffd700;font-weight:700;font-size:12px;cursor:pointer;transition:.15s;letter-spacing:1px;text-align:center}
+.btn:hover{background:#3a2214;border-color:#a0682a}
+.btn:active{background:#1a0e06}
+.btn.danger{background:#2a0a0a;border-color:#6a1a1a;color:#ff6b6b}
+.btn.danger:hover{background:#4a1818}
+.btn.heal{background:#0a2a0a;border-color:#1a5a1a;color:#4cff4c}
 
-/* Recruitment modal */
-#modalOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;justify-content:center;align-items:center}
+#modalOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;justify-content:center;align-items:center}
 #modalOverlay.show{display:flex}
-#modal{background:linear-gradient(180deg,#2c1810,#1a0e08);border:3px solid #ffd700;border-radius:8px;padding:20px;max-width:500px;width:90%;color:#e0d5c0;max-height:80vh;overflow-y:auto}
-#modal h2{text-align:center;color:#ffd700;margin-bottom:12px;font-size:20px}
-#modal .gold{text-align:center;font-size:16px;color:#ffd700;margin-bottom:14px}
-.recruitItem{display:flex;align-items:center;justify-content:space-between;padding:10px;margin:6px 0;background:rgba(255,255,255,.05);border-radius:4px;gap:10px;flex-wrap:wrap}
-.recruitItem .rName{font-weight:700;font-size:14px;color:#ffd700;min-width:80px}
-.recruitItem .rStats{font-size:11px;color:#a09080;flex:1}
-.recruitItem .rPrice{font-size:14px;color:#ffd700;font-weight:700}
-.recruitItem button{padding:6px 14px;border:2px solid #8b6914;border-radius:4px;background:#3c2a14;color:#ffd700;cursor:pointer;font-weight:700}
-.recruitItem button:hover{background:#5a3a1a}
+#modal{background:linear-gradient(180deg,#1a1008,#0d0604);border:3px solid #ffd700;border-radius:6px;padding:16px;max-width:480px;width:92%;color:#c8b898;max-height:80vh;overflow-y:auto}
+#modal h2{text-align:center;color:#ffd700;margin-bottom:10px;font-size:18px;letter-spacing:2px}
+#modal .gold{text-align:center;font-size:15px;color:#ffd700;margin-bottom:12px}
+.recruitItem{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;margin:4px 0;background:rgba(255,255,255,.04);border-radius:3px;gap:8px;flex-wrap:wrap;font-size:11px}
+.recruitItem .rName{font-weight:700;font-size:13px;color:#ffd700;min-width:70px}
+.recruitItem .rStats{color:#8a7870;flex:1}
+.recruitItem .rPrice{font-size:13px;color:#ffd700;font-weight:700;min-width:50px;text-align:right}
+.recruitItem button{padding:5px 12px;border:2px solid #6b4a1a;border-radius:3px;background:#261810;color:#ffd700;cursor:pointer;font-weight:700;font-size:11px}
+.recruitItem button:hover{background:#3a2214}
 .recruitItem button:disabled{opacity:.3;cursor:not-allowed}
-#modal .closeBtn{display:block;margin:16px auto 0;padding:10px 40px;border:2px solid #8b6914;border-radius:4px;background:#3c2a14;color:#ffd700;font-size:15px;font-weight:700;cursor:pointer}
-#modal .closeBtn:hover{background:#5a3a1a}
+#modal .closeBtn{display:block;margin:14px auto 0;padding:8px 36px;border:2px solid #6b4a1a;border-radius:3px;background:#261810;color:#ffd700;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:1px}
+#modal .closeBtn:hover{background:#3a2214}
+#toggleRecruit{position:absolute;top:6px;right:6px;z-index:5;padding:5px 12px;border:2px solid #6b4a1a;border-radius:3px;background:#261810;color:#ffd700;font-size:11px;cursor:pointer;font-weight:700}
+#toggleRecruit:hover{background:#3a2214}
 
-#toggleRecruit{position:absolute;top:8px;right:8px;z-index:5;padding:6px 14px;border:2px solid #8b6914;border-radius:4px;background:#3c2a14;color:#ffd700;font-size:12px;cursor:pointer;font-weight:700}
-#toggleRecruit:hover{background:#5a3a1a}
-
-@media(max-width:960px){#game{flex-direction:column;align-items:center}#panel{width:100%;max-width:640px;min-height:auto;flex-direction:row;flex-wrap:wrap}#logBox{max-height:100px}}
+@media(max-width:1200px){#game{flex-direction:column;align-items:center}#panel{width:100%;max-width:896px;min-height:auto;flex-direction:row;flex-wrap:wrap;gap:6px}#logBox{max-height:100px}}
 </style>
 </head>
 <body>
 <div id="game">
-  <div id="canvasWrap">
-    <canvas id="c" width="640" height="640"></canvas>
+  <div id="canvasWrap" style="position:relative">
+    <canvas id="c"></canvas>
     <button id="toggleRecruit" onclick="showRecruitment()">🏪 雇佣所</button>
   </div>
   <div id="panel">
     <h2>⚔ 火焰纹章</h2>
     <div id="turnInd" class="player">🔵 玩家回合</div>
-    <div id="unitInfo"><span class="label">选择一个单位查看详情</span></div>
+    <div id="unitInfo"><span class="label">选择单位查看详情</span></div>
     <div id="logBox"></div>
     <div class="btnRow">
-      <button class="btn" id="btnEndTurn" onclick="endTurn()">⏭ 结束回合</button>
+      <button class="btn" onclick="endTurn()">⏭ 结束回合</button>
       <button class="btn danger" onclick="resetGame()">🔄 重开</button>
     </div>
   </div>
 </div>
-<div id="modalOverlay" id="modalOverlay">
+<div id="modalOverlay">
   <div id="modal">
     <h2>🏪 雇佣所</h2>
     <div class="gold" id="goldDisplay">💰 金币: 1000 G</div>
@@ -88,39 +82,356 @@ canvas{border:3px solid #8b6914;border-radius:4px;cursor:pointer;display:block}
 
 <script>
 // ================================================================
-//  FLAME EMBLEM TACTICS — Single-file SRPG
+//  FLAME EMBLEM TACTICS — Pixel Art SRPG — 14x10 Map
 // ================================================================
 
-const canvas = document.getElementById('c');
-const ctx = canvas.getContext('2d');
-const TILE = 80, MAP_W = 8, MAP_H = 8;
+const TILE=64, MAP_W=14, MAP_H=10;
+const W=MAP_W*TILE, H=MAP_H*TILE;
+const canvas=document.getElementById('c');
+canvas.width=W; canvas.height=H;
+const ctx=canvas.getContext('2d');
+ctx.imageSmoothingEnabled=false;
 
-// ---- Terrain: 0=plain 1=forest 2=mountain 3=lake ----
-const terrainMap = [
-  [0,0,0,3,3,0,0,0],
-  [0,1,3,3,0,0,0,0],
-  [0,0,0,0,1,0,0,2],
-  [0,0,1,0,0,0,2,2],
-  [0,0,0,0,0,1,0,0],
-  [0,0,2,0,0,0,0,0],
-  [0,1,2,0,0,1,0,0],
-  [0,0,0,0,0,0,0,0],
-];
-const terrNames = ['平原','森林','山地','湖泊'];
-const terrColors = ['#6b8e4a','#3d6b2e','#7a6a5a','#4a80b4'];
+// ================================================================
+//  PIXEL SPRITE GENERATOR
+// ================================================================
+// Sprite format: array of strings, each char = pixel color
+// Colors: _=transparent, S=skin, H=hair, B=blue, R=red, W=white
+//         G=gray, D=dark, Y=gold, L=leather, M=magic, A=darkred
+//         C=cyan, O=orange, K=pink, T=teal, P=purple
+const SPRITE_SCALE = 3; // 3x pixel rendering
+const SPRITE_W = 16, SPRITE_H = 24;
 
-// ---- Weapon types & triangle ----
-// sword > axe, axe > lance, lance > sword
-// bow > flying(+50% dmg), magic no triangle
-const WEAPON = {SWORD:'剑',LANCE:'枪',AXE:'斧',BOW:'弓',MAGIC:'魔法',STAFF:'杖'};
-const TRIANGLE = {'剑':'斧','斧':'枪','枪':'剑'};
-function weaponAdvantage(atkType, defType){
-  if(TRIANGLE[atkType]===defType) return 1; // atk beats def
-  if(TRIANGLE[defType]===atkType) return -1; // def beats atk
-  return 0;
+function parseSprite(lines){
+  // Create offscreen canvas for the sprite
+  const c=document.createElement('canvas');
+  c.width=SPRITE_W; c.height=SPRITE_H;
+  const cx=c.getContext('2d');
+  for(let y=0;y<Math.min(lines.length,SPRITE_H);y++){
+    for(let x=0;x<Math.min(lines[y].length,SPRITE_W);x++){
+      const ch=lines[y][x];
+      if(ch==='_') continue;
+      const color=SPRITE_COLORS[ch]||'#000';
+      cx.fillStyle=color;
+      cx.fillRect(x,y,1,1);
+    }
+  }
+  return c;
+}
+function drawSprite(spr, sx, sy, sw, sh){
+  ctx.drawImage(spr, 0,0,SPRITE_W,SPRITE_H, sx, sy, sw, sh);
+}
+function drawSpriteFlipped(spr, sx, sy, sw, sh){
+  ctx.save(); ctx.translate(sx+sw/2,sy); ctx.scale(-1,1);
+  ctx.drawImage(spr,0,0,SPRITE_W,SPRITE_H,-sw/2,0,sw,sh);
+  ctx.restore();
 }
 
-// ---- Recruitment templates ----
+const SPRITE_COLORS = {
+  '_':'transparent', 'S':'#fbb040', 's':'#ffcc80',
+  'H':'#5a3010', 'h':'#f0d040', 'r':'#c04020',
+  'B':'#3050b0', 'b':'#5080e0', 'c':'#204090',
+  'R':'#c03030', 'a':'#801818', 'd':'#501010',
+  'W':'#f0f0f0', 'w':'#d0d0d0',
+  'G':'#808080', 'g':'#a0a0a0', 'n':'#606060',
+  'D':'#1a1a1a', 'K':'#2a2a2a',
+  'Y':'#d4a030', 'y':'#f0c040',
+  'L':'#8b5a30', 'l':'#a07040',
+  'M':'#5a30a0', 'm':'#7a50c0', 'P':'#3a2070',
+  'O':'#e08030', 'o':'#f0a050',
+  'C':'#40b0c0', 'T':'#208080',
+  'F':'#e89070',
+  'V':'#40a040', 'v':'#60c060',
+  'E':'#d0d0a0',
+};
+
+// ---- Class sprites (pixel art) ----
+const SPRITES = {
+  lord: parseSprite([
+    '______DDD_______',
+    '_____DBBBD______',
+    '____DBBBBBD_____',
+    '____DYYYBDD_____',
+    '____DBBBBD______',
+    '___DDBBBBDD_____',
+    '___DSSBBBBB_____',
+    '__DDSSSSSSSD_____',
+    '__DShShShSD______',
+    '__DShShShSD______',
+    '__DDSSSSSDD______',
+    '___DDDDDDDD_____',
+    '__DcCcCcCcD______',
+    '__DcCcCcCcD______',
+    '__DcCcCcCcD______',
+    '__DcccccccD______',
+    '__DcccccccD______',
+    '___DLLLLLD______',
+    '___DLnnGLD______',
+    '___DLnnGLD______',
+    '___DLnnGLD______',
+    '___DDDDDDD______',
+    '___DDDDDDD______',
+    '________________',
+  ]),
+  knight: parseSprite([
+    '______DDD_______',
+    '_____DBBBD______',
+    '____DBBBBBD_____',
+    '____DBGbGBD_____',
+    '___DDBBBBDD_____',
+    '___DSSBBBBB_____',
+    '__DDSSSSSSSD_____',
+    '__DShShShSD______',
+    '__DDSSSSSD_______',
+    '__DSSSDDDD_______',
+    '__DBBBBBD________',
+    '__DBBBBBD________',
+    '__DDDDDDD________',
+    '__DbLbLbLD_______',
+    '__DbLbLbLD_______',
+    '__DDDDDDDD_______',
+    '__DLLLLLLD_______',
+    '__DLGGLGGD_______',
+    '__DLGGLGGD_______',
+    '__DDDDDDDD_______',
+    '__DDDDDDDD_______',
+    '________________',
+    '________________',
+    '________________',
+  ]),
+  mage: parseSprite([
+    '_______DDD______',
+    '______DMMMD_____',
+    '_____DMMMMMD____',
+    '____DMmmmmMD____',
+    '____DMMMMMD_____',
+    '___DDMMMMMDD____',
+    '___DSSMMMMM_____',
+    '__DDSSSSSSSD_____',
+    '__DShShShSD______',
+    '__DShShShSD______',
+    '__DDSSSSSDD______',
+    '___DDDDDDDD_____',
+    '__DMMMMMMMMD_____',
+    '__DMMMMMMMMD_____',
+    '__DMMMMMMMMD_____',
+    '__DDMMMMMDDD_____',
+    '__DDMMMMMDD______',
+    '__DLMMMMMLD______',
+    '__DLLLLLLLD______',
+    '__DLGGLGGLD______',
+    '__DDDDDDDDD______',
+    '__DDDDDDDDD______',
+    '________________',
+    '________________',
+  ]),
+  priest: parseSprite([
+    '______DDD_______',
+    '_____DWWWD______',
+    '____DWWWWWD_____',
+    '____DWWWWWD_____',
+    '____DWWWWWD_____',
+    '___DDWWWWWDD____',
+    '___DSSWWWWW_____',
+    '__DDSSSSSSSD_____',
+    '__DShShShSD______',
+    '__DShShShSD______',
+    '__DDSSSSSD_______',
+    '__DDDDDDDD_______',
+    '__DWwWwWwWD______',
+    '__DWwWwWwWD______',
+    '__DWwWwWwWD______',
+    '__DWWWWWWWD______',
+    '__DWWWWWWWD______',
+    '__DLLLLLLLD______',
+    '__DLGGLGGLD______',
+    '__DLGGLGGLD______',
+    '__DDDDDDDDD______',
+    '__DDDDDDDDD______',
+    '________________',
+    '________________',
+  ]),
+  dragon_knight: parseSprite([
+    '______DDD_______',
+    '_____DRRRD______',
+    '____DRRRRRD_____',
+    '____DRaaaaD_____',
+    '___DDRRRRRDD____',
+    '__DDDSSRRRR_____',
+    '_DDDSSSSSSSD____',
+    '__DDRRSSSSSD____',
+    '__DDShShShSD_____',
+    '__DDShShShSD_____',
+    '__DDSSSSSSDD_____',
+    '__DDDDDDDDDD_____',
+    '__DRRRRRRRRD_____',
+    '__DRRRRRRRRD_____',
+    '__DRRRRRRRRD_____',
+    '_DDRRRRRDDDD_____',
+    '_DDRRRRD_________',
+    '_DDLLLLLD________',
+    '_DDLLLLLD________',
+    '_DLGGLGGLD_______',
+    '_DDDDDDDDD_______',
+    '________________',
+    '________________',
+    '________________',
+  ]),
+  archer: parseSprite([
+    '______DDD_______',
+    '_____DVVVD______',
+    '____DVVVVVD_____',
+    '____DVVVVVD_____',
+    '___DDVVVVVDD____',
+    '___DSSVVVVV_____',
+    '__DDSSSSSSSD_____',
+    '__DShShShSD______',
+    '__DShShShSD______',
+    '__DDSSSSSD_______',
+    '__DDDDDDDD_______',
+    '__DVvVvVvVD______',
+    '__DVvVvVvVD______',
+    '__DVVVVVVVD______',
+    '__DVVVVVVVD______',
+    '__DLLLLLLLD______',
+    '__DLLLLLLLD______',
+    '__DLnnnGLD_______',
+    '__DLnnnGLD_______',
+    '__DDDDDDDD_______',
+    '__DDDDDDDD_______',
+    '________________',
+    '________________',
+    '________________',
+  ]),
+  fighter: parseSprite([
+    '______DDD_______',
+    '_____DRRRD______',
+    '____DRRRRRD_____',
+    '____DRaaaaD_____',
+    '___DDRRRRRDD____',
+    '___DSSRRRRR_____',
+    '__DDSSSSSSSD_____',
+    '__DShShShSD______',
+    '__DShShShSD______',
+    '__DDSSSSSDD______',
+    '___DDDDDDDD_____',
+    '__DRRrRrRrD______',
+    '__DRRrRrRrD______',
+    '__DRRRRRRRD______',
+    '__DRRRRRRRD______',
+    '___DLLLLLD______',
+    '___DLLLLLD______',
+    '___DLGGGLD______',
+    '___DLGGGLD______',
+    '___DDDDDDD______',
+    '___DDDDDDD______',
+    '________________',
+    '________________',
+    '________________',
+  ]),
+  enemy_mage: parseSprite([
+    '_______DDD______',
+    '______DMMMD_____',
+    '_____DMMMMMD____',
+    '____DMmmmmMD____',
+    '____DMMMMMD_____',
+    '___DDMMMMMDD____',
+    '___DSSMMMMM_____',
+    '__DDSSSSSSSD_____',
+    '__DShShShSD______',
+    '__DShShShSD______',
+    '__DDSSSSSDD______',
+    '___DDDDDDDD_____',
+    '__DMMMmMmMD______',
+    '__DMMMmMmMD______',
+    '__DMMMMMMMMD_____',
+    '__DDMMMMMDDD_____',
+    '__DDMMMMMDD______',
+    '__DLLLLLLLD______',
+    '__DLGGLGGLD______',
+    '__DDDDDDDDD______',
+    '__DDDDDDDDD______',
+    '________________',
+    '________________',
+    '________________',
+  ]),
+  enemy_heavy: parseSprite([
+    '______DDD_______',
+    '_____DRRRD______',
+    '____DRRRRRD_____',
+    '____DRGRGD______',
+    '___DDRRRRRDD____',
+    '__DDDSSRRRRR____',
+    '___DSSSSSSSD____',
+    '___DShShShSD_____',
+    '___DShShShSD_____',
+    '___DDSSSSSD______',
+    '___DDDDDDD_______',
+    '___DRRRRRD_______',
+    '___DRRRRRD_______',
+    '___DDDDDDD_______',
+    '___DRrRrRrD______',
+    '___DDDDDDDD______',
+    '___DDDDDDDD______',
+    '___DLLLLLLD______',
+    '___DLGGLGGD______',
+    '___DDDDDDDD______',
+    '___DDDDDDDD______',
+    '________________',
+    '________________',
+    '________________',
+  ]),
+};
+
+// Map class -> sprite
+function getSprite(unit){
+  if(!unit.pixelSprite){
+    // Determine sprite based on class and team
+    const cls = unit.cls;
+    if(unit.team==='player'){
+      if(cls==='领主') unit.pixelSprite = SPRITES.lord;
+      else if(cls==='骑士') unit.pixelSprite = SPRITES.knight;
+      else if(cls==='佣兵') unit.pixelSprite = SPRITES.fighter;
+      else if(cls==='魔法师') unit.pixelSprite = SPRITES.mage;
+      else if(cls==='僧侣') unit.pixelSprite = SPRITES.priest;
+      else if(cls==='龙骑士') unit.pixelSprite = SPRITES.dragon_knight;
+      else if(cls==='弓箭手') unit.pixelSprite = SPRITES.archer;
+      else unit.pixelSprite = SPRITES.knight;
+    }else{
+      if(cls==='战士'||cls==='蛮族战士') unit.pixelSprite = SPRITES.fighter;
+      else if(cls==='魔法师'||cls==='暗魔法师') unit.pixelSprite = SPRITES.enemy_mage;
+      else if(cls==='重甲骑士'||cls==='重甲兵') unit.pixelSprite = SPRITES.enemy_heavy;
+      else if(cls==='龙骑士'||cls==='龙骑·猎手') unit.pixelSprite = SPRITES.dragon_knight;
+      else unit.pixelSprite = SPRITES.fighter;
+    }
+  }
+  return unit.pixelSprite;
+}
+
+// ================================================================
+//  TERRAIN DATA — 14x10 bigger map
+// ================================================================
+// 0=plain 1=forest 2=mountain 3=lake
+const terrainMap = [
+  [0,0,0,0,0,3,3,0,0,0,0,0,0,0],
+  [0,1,0,0,3,3,0,0,1,0,0,0,0,0],
+  [0,0,1,0,0,0,0,0,0,0,1,0,2,2],
+  [0,0,0,0,0,1,0,0,0,0,0,0,2,2],
+  [0,2,2,0,0,0,0,1,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,2,0,0,0],
+  [0,0,1,0,3,3,0,0,1,0,0,0,0,0],
+  [0,0,0,0,3,0,0,0,0,0,0,1,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+];
+const terrColors = ['#5a8a3a','#2d5a1a','#6a5a4a','#3a6aaa'];
+
+// ================================================================
+//  GAME STATE
+// ================================================================
+const WEAPON = {剑:'剑',枪:'枪',斧:'斧',弓:'弓',魔法:'魔法',杖:'杖'};
+const TRIANGLE = {剑:'斧',斧:'枪',枪:'剑'};
+
 const RECRUITS = [
   {name:'佣兵·格雷',cls:'佣兵',weaponType:'剑',maxHp:26,str:9,mag:0,skill:9,spd:10,def:5,res:3,move:3,maxDura:25,isFlying:false,canHeal:false,price:300},
   {name:'魔法师·丽娜',cls:'魔法师',weaponType:'魔法',maxHp:22,str:0,mag:9,skill:7,spd:6,def:2,res:6,move:3,maxDura:20,isFlying:false,canHeal:false,price:400},
@@ -129,347 +440,277 @@ const RECRUITS = [
   {name:'弓箭手·维尔',cls:'弓箭手',weaponType:'弓',maxHp:24,str:8,mag:0,skill:9,spd:8,def:4,res:3,move:3,maxDura:20,isFlying:false,canHeal:false,price:350},
 ];
 
-// ---- Game State ----
-let units = [];
-let gold = 1000;
-let phase = 'player'; // 'player' | 'enemy'
-let selectedUnit = null;
-let moveRange = [];
-let attackTargets = [];
-let playerActedSet = new Set();
-let gameOver = false;
-let logMessages = [];
+let units=[], gold=1000, phase='player', selectedUnit=null, moveRange=[], attackTargets=[], gameOver=false, logMessages=[];
 
-// ---- Helper ----
-function makeUnit(data){
-  return {
-    ...data,
-    hp: data.maxHp,
-    weaponDurability: data.maxDura,
-    acted: false,
-    x: data.x, y: data.y,
-    team: data.team,
-    id: Math.random().toString(36).slice(2,8),
-  };
-}
+function makeUnit(d){return{...d,hp:d.maxHp,weaponDurability:d.maxDura,acted:false,id:Math.random().toString(36).slice(2,8)};}
 
 function resetGame(){
-  units = [];
-  playerActedSet = new Set();
-  gameOver = false;
-  phase = 'player';
-  gold = 1000;
-  selectedUnit = null;
-  moveRange = [];
-  attackTargets = [];
-  logMessages = [];
-
-  // Prince (Lord) — mandatory player unit
+  units=[]; gameOver=false; phase='player'; gold=1000; selectedUnit=null; moveRange=[]; attackTargets=[]; logMessages=[];
   units.push(makeUnit({name:'王子·艾克',cls:'领主',team:'player',x:1,y:1,weaponType:'剑',maxHp:28,str:10,mag:0,skill:8,spd:9,def:7,res:3,move:3,maxDura:30,isFlying:false,canHeal:false}));
-
-  // Starting companion
   units.push(makeUnit({name:'骑士·缇娅',cls:'骑士',team:'player',x:0,y:2,weaponType:'枪',maxHp:32,str:11,mag:0,skill:7,spd:7,def:7,res:3,move:3,maxDura:25,isFlying:false,canHeal:false}));
-
-  // Enemies
-  units.push(makeUnit({name:'蛮族战士',cls:'战士',team:'enemy',x:7,y:2,weaponType:'斧',maxHp:26,str:10,mag:0,skill:6,spd:6,def:4,res:2,move:2,maxDura:20,isFlying:false,canHeal:false}));
-  units.push(makeUnit({name:'暗魔法师',cls:'魔法师',team:'enemy',x:6,y:4,weaponType:'魔法',maxHp:22,str:0,mag:9,skill:7,spd:6,def:2,res:6,move:2,maxDura:18,isFlying:false,canHeal:false}));
-  units.push(makeUnit({name:'龙骑·猎手',cls:'龙骑士',team:'enemy',x:7,y:5,weaponType:'枪',maxHp:28,str:11,mag:0,skill:7,spd:6,def:7,res:2,move:4,maxDura:20,isFlying:true,canHeal:false}));
-  units.push(makeUnit({name:'重甲兵',cls:'重甲骑士',team:'enemy',x:6,y:1,weaponType:'枪',maxHp:34,str:9,mag:0,skill:5,spd:4,def:9,res:1,move:2,maxDura:20,isFlying:false,canHeal:false}));
-
+  units.push(makeUnit({name:'蛮族战士',cls:'战士',team:'enemy',x:12,y:2,weaponType:'斧',maxHp:26,str:10,mag:0,skill:6,spd:6,def:4,res:2,move:2,maxDura:20,isFlying:false,canHeal:false}));
+  units.push(makeUnit({name:'暗魔法师',cls:'魔法师',team:'enemy',x:11,y:4,weaponType:'魔法',maxHp:22,str:0,mag:9,skill:7,spd:6,def:2,res:6,move:2,maxDura:18,isFlying:false,canHeal:false}));
+  units.push(makeUnit({name:'龙骑·猎手',cls:'龙骑士',team:'enemy',x:13,y:5,weaponType:'枪',maxHp:28,str:11,mag:0,skill:7,spd:6,def:7,res:2,move:4,maxDura:20,isFlying:true,canHeal:false}));
+  units.push(makeUnit({name:'重甲兵',cls:'重甲骑士',team:'enemy',x:11,y:1,weaponType:'枪',maxHp:34,str:9,mag:0,skill:5,spd:4,def:9,res:1,move:2,maxDura:20,isFlying:false,canHeal:false}));
+  units.push(makeUnit({name:'蛮族斧兵',cls:'战士',team:'enemy',x:13,y:7,weaponType:'斧',maxHp:24,str:11,mag:0,skill:5,spd:5,def:4,res:1,move:2,maxDura:18,isFlying:false,canHeal:false}));
   updateUI(); render();
-  showRecruitment(); // Show recruitment at start
+  showRecruitment();
 }
 
-// ---- Terrain helpers ----
+// ---- Terrain ----
 function isBlocked(x,y,flying){
   if(x<0||x>=MAP_W||y<0||y>=MAP_H) return true;
-  const t = terrainMap[y][x];
-  if(t===2 && !flying) return true; // mountain blocks non-flying
-  if(t===3 && !flying) return true; // lake blocks non-flying
+  const t=terrainMap[y][x];
+  if((t===2||t===3)&&!flying) return true;
   return false;
 }
 function moveCost(x,y,flying){
   if(x<0||x>=MAP_W||y<0||y>=MAP_H) return 999;
-  const t = terrainMap[y][x];
-  if(flying) return 1; // flying ignores all terrain costs
-  if(t===1) return 2; // forest costs 2
-  if(t===2||t===3) return 999; // can't enter
+  if(flying) return 1;
+  const t=terrainMap[y][x];
+  if(t===1) return 2;
+  if(t===2||t===3) return 999;
   return 1;
 }
-function getUnitAt(x,y){
-  return units.find(u=>u.x===x&&u.y===y&&u.hp>0);
-}
+function getUnitAt(x,y){return units.find(u=>u.x===x&&u.y===y&&u.hp>0);}
 
-// ---- BFS: movement range ----
+// ---- BFS Movement ----
 function getMoveRange(unit){
-  const range = [];
-  const visited = new Set();
-  const queue = [{x:unit.x, y:unit.y, cost:0}];
-  visited.add(`${unit.x},${unit.y}`);
-  range.push({x:unit.x, y:unit.y});
-
+  const range=[], visited=new Set(), queue=[{x:unit.x,y:unit.y,cost:0}];
+  visited.add(`${unit.x},${unit.y}`); range.push({x:unit.x,y:unit.y});
   while(queue.length){
-    const cur = queue.shift();
+    const cur=queue.shift();
     for(const [dx,dy] of [[0,1],[0,-1],[1,0],[-1,0]]){
       const nx=cur.x+dx, ny=cur.y+dy;
       if(nx<0||nx>=MAP_W||ny<0||ny>=MAP_H) continue;
       if(visited.has(`${nx},${ny}`)) continue;
       if(isBlocked(nx,ny,unit.isFlying)) continue;
-      const addCost = moveCost(nx,ny,unit.isFlying);
-      const totalCost = cur.cost + addCost;
-      if(totalCost > unit.move) continue;
-      // Check if occupied by another unit (can't walk through)
-      const occ = getUnitAt(nx,ny);
-      // Can walk through if it's the starting position
-      if(occ && !(nx===unit.x && ny===unit.y)){
-        // Can't move through units (ally or enemy)
-        // But can attack enemy at range 1
-        if(occ.team !== unit.team && totalCost <= unit.move){
-          // Add to move range but marked as enemy position
-        }
-        continue;
-      }
+      const addCost=moveCost(nx,ny,unit.isFlying);
+      const totalCost=cur.cost+addCost;
+      if(totalCost>unit.move) continue;
+      const occ=getUnitAt(nx,ny);
+      if(occ&&!(nx===unit.x&&ny===unit.y)) continue;
       visited.add(`${nx},${ny}`);
-      queue.push({x:nx, y:ny, cost:totalCost});
-      range.push({x:nx, y:ny});
+      queue.push({x:nx,y:ny,cost:totalCost});
+      range.push({x:nx,y:ny});
     }
   }
   return range;
 }
 
-// ---- Attack targets (adjacent 4-dir + bow/magic range 2) ----
+// ---- Attack Targets ----
 function getAttackTargets(unit){
-  const targets = [];
-  const isRanged = (unit.weaponType==='弓'||unit.weaponType==='魔法');
-  const maxRange = isRanged ? 2 : 1;
-
-  // BFS limited range
-  const visited = new Set([`${unit.x},${unit.y}`]);
-  const queue = [{x:unit.x, y:unit.y, d:0}];
-
+  const targets=[], isRanged=(unit.weaponType==='弓'||unit.weaponType==='魔法');
+  const maxRange=isRanged?2:1, visited=new Set([`${unit.x},${unit.y}`]);
+  const queue=[{x:unit.x,y:unit.y,d:0}];
   while(queue.length){
-    const cur = queue.shift();
-    if(cur.d >= maxRange) continue;
+    const cur=queue.shift();
+    if(cur.d>=maxRange) continue;
     for(const [dx,dy] of [[0,1],[0,-1],[1,0],[-1,0]]){
       const nx=cur.x+dx, ny=cur.y+dy;
       if(nx<0||nx>=MAP_W||ny<0||ny>=MAP_H) continue;
       if(visited.has(`${nx},${ny}`)) continue;
       visited.add(`${nx},${ny}`);
-      const e = getUnitAt(nx,ny);
-      if(e && e.team !== unit.team && e.hp > 0){
-        targets.push(e);
-      }
-      if(cur.d+1 < maxRange){
-        queue.push({x:nx, y:ny, d:cur.d+1});
-      }
+      const e=getUnitAt(nx,ny);
+      if(e&&e.team!==unit.team&&e.hp>0) targets.push(e);
+      if(cur.d+1<maxRange) queue.push({x:nx,y:ny,d:cur.d+1});
     }
   }
   return targets;
 }
-
-// ---- Check if unit can be healed (adjacent ally, not full HP) ----
 function getHealTargets(unit){
-  if(!unit.canHeal) return [];
-  if(unit.weaponDurability <= 0) return [];
-  const targets = [];
+  if(!unit.canHeal||unit.weaponDurability<=0) return [];
+  const targets=[];
   for(const [dx,dy] of [[0,1],[0,-1],[1,0],[-1,0]]){
     const nx=unit.x+dx, ny=unit.y+dy;
-    const ally = getUnitAt(nx,ny);
-    if(ally && ally.team===unit.team && ally.hp<ally.maxHp){
-      targets.push(ally);
-    }
+    const ally=getUnitAt(nx,ny);
+    if(ally&&ally.team===unit.team&&ally.hp<ally.maxHp) targets.push(ally);
   }
   return targets;
 }
 
 // ---- Combat ----
-function calcDamage(attacker, defender){
-  let baseDmg;
-  if(attacker.weaponType==='魔法'){
-    baseDmg = attacker.mag + 4 - defender.res;
-  }else{
-    baseDmg = attacker.str + 5 - defender.def;
+function calcDamage(atk,def){
+  let base=atk.weaponType==='魔法'?atk.mag+4-def.res:atk.str+5-def.def;
+  const adv=weaponAdvantage(atk.weaponType,def.weaponType);
+  if(adv===1) base+=2; if(adv===-1) base-=2;
+  if(atk.weaponType==='弓'&&def.isFlying) base=Math.ceil(base*1.5);
+  // Lord aura
+  const lord=units.find(u=>u.name==='王子·艾克'&&u.hp>0);
+  if(lord){
+    if(atk.team==='player'&&Math.abs(atk.x-lord.x)<=2&&Math.abs(atk.y-lord.y)<=2&&atk!==lord) base+=1;
+    if(def.team==='player'&&Math.abs(def.x-lord.x)<=2&&Math.abs(def.y-lord.y)<=2&&def!==lord) base-=1;
   }
-  // Weapon triangle
-  const adv = weaponAdvantage(attacker.weaponType, defender.weaponType);
-  if(adv===1) baseDmg += 2;
-  if(adv===-1) baseDmg -= 2;
-  // Bow vs flying
-  if(attacker.weaponType==='弓' && defender.isFlying) baseDmg = Math.ceil(baseDmg * 1.5);
-  // Lord aura: nearby allies get +1 dmg
-  if(attacker.team==='player'){
-    const lord = units.find(u=>u.name==='王子·艾克'&&u.hp>0);
-    if(lord && Math.abs(attacker.x-lord.x)<=2 && Math.abs(attacker.y-lord.y)<=2 && attacker!==lord){
-      baseDmg += 1;
-    }
-  }
-  // Lord aura: nearby allies take -1 dmg
-  if(defender.team==='player'){
-    const lord = units.find(u=>u.name==='王子·艾克'&&u.hp>0);
-    if(lord && Math.abs(defender.x-lord.x)<=2 && Math.abs(defender.y-lord.y)<=2 && defender!==lord){
-      baseDmg -= 1;
-    }
-  }
-  return Math.max(1, Math.floor(baseDmg));
+  return Math.max(1,Math.floor(base));
 }
-
-function executeCombat(attacker, defender, isCounter=false){
-  if(!isCounter){
-    attacker.weaponDurability--;
+function weaponAdvantage(atk,def){
+  if(TRIANGLE[atk]===def) return 1;
+  if(TRIANGLE[def]===atk) return -1;
+  return 0;
+}
+function executeCombat(attacker,defender,isCtr=false){
+  if(!isCtr) attacker.weaponDurability--;
+  const dmg=calcDamage(attacker,defender);
+  defender.hp-=dmg;
+  let log=`${attacker.name}(${WEAPON[attacker.weaponType]}) → ${defender.name}: ${dmg} 点伤害！`;
+  if(attacker.weaponType==='弓'&&defender.isFlying) log+=' [特效·克飞行]';
+  if(!isCtr&&weaponAdvantage(attacker.weaponType,defender.weaponType)===1) log+=' [武器克制]';
+  addLog(log,'logGood');
+  if(attacker.weaponDurability<=0) addLog(`${attacker.name} 武器耐久耗尽！`,'logBad');
+  if(defender.hp<=0){defender.hp=0;addLog(`${defender.name} 被击败！`,'logBad');}
+  else if(!isCtr&&!attacker.canHeal){
+    const canCntr=!defender.canHeal&&defender.weaponDurability>0;
+    const cr=(defender.weaponType==='弓'||defender.weaponType==='魔法')?2:1;
+    const dist=Math.abs(attacker.x-defender.x)+Math.abs(attacker.y-defender.y);
+    if(canCntr&&dist<=cr&&defender.hp>0){addLog(`${defender.name} 反击！`,'logInfo');executeCombat(defender,attacker,true);}
   }
-  const dmg = calcDamage(attacker, defender);
-  defender.hp -= dmg;
-  let log = `${attacker.name}(${WEAPON[attacker.weaponType]}) → ${defender.name}: ${dmg} 点伤害！`;
-  if(attacker.weaponType==='弓' && defender.isFlying) log += ' [特效·克飞行]';
-  if(!isCounter && weaponAdvantage(attacker.weaponType, defender.weaponType)===1) log += ' [武器克制]';
-  addLog(log, 'logGood');
-  if(attacker.weaponDurability<=0) addLog(`${attacker.name} 武器耐久耗尽！`, 'logBad');
-
-  if(defender.hp<=0){
-    defender.hp=0;
-    addLog(`${defender.name} 被击败！`, 'logBad');
-  }else if(!isCounter && !attacker.canHeal){
-    // Counter-attack: if defender can attack back at range 1
-    const defCanCounter = !defender.canHeal && defender.weaponDurability>0;
-    const counterRange = (defender.weaponType==='弓'||defender.weaponType==='魔法')?2:1;
-    const dist = Math.abs(attacker.x-defender.x)+Math.abs(attacker.y-defender.y);
-    if(defCanCounter && dist<=counterRange && defender.hp>0){
-      addLog(`${defender.name} 反击！`, 'logInfo');
-      executeCombat(defender, attacker, true);
-    }
-  }
-  // Check deaths
   if(attacker.hp<=0) attacker.hp=0;
   if(defender.hp<=0) defender.hp=0;
 }
-
-function executeHeal(healer, target){
-  const healAmt = 10 + healer.mag;
-  const actualHeal = Math.min(healAmt, target.maxHp - target.hp);
-  target.hp += actualHeal;
-  healer.weaponDurability--;
-  addLog(`${healer.name} 治愈 ${target.name} +${actualHeal} HP！`, 'logInfo');
-  if(healer.weaponDurability<=0) addLog(`${healer.name} 杖耐久耗尽！`, 'logBad');
+function executeHeal(healer,target){
+  const healAmt=Math.min(10+healer.mag, target.maxHp-target.hp);
+  target.hp+=healAmt; healer.weaponDurability--;
+  addLog(`${healer.name} 治愈 ${target.name} +${healAmt} HP！`,'logInfo');
+  if(healer.weaponDurability<=0) addLog(`${healer.name} 杖耐久耗尽！`,'logBad');
 }
-
-// ---- Win/Loss check ----
 function checkWinLoss(){
-  const playerAlive = units.filter(u=>u.team==='player'&&u.hp>0);
-  const enemyAlive = units.filter(u=>u.team==='enemy'&&u.hp>0);
-  if(playerAlive.length===0){ gameOver=true; addLog('💀 全军覆没…战斗失败！','logBad'); return true; }
-  if(enemyAlive.length===0){ gameOver=true; addLog('🏆 敌方全灭！胜利！','logInfo'); return true; }
+  const pAlive=units.filter(u=>u.team==='player'&&u.hp>0);
+  const eAlive=units.filter(u=>u.team==='enemy'&&u.hp>0);
+  if(pAlive.length===0){gameOver=true;addLog('💀 全军覆没…战斗失败！','logBad');return true;}
+  if(eAlive.length===0){gameOver=true;addLog('🏆 敌方全灭！胜利！','logInfo');return true;}
   return false;
 }
 
 // ================================================================
-//  RENDERING
+//  RENDERING (Pixel Art)
 // ================================================================
 function render(){
-  ctx.clearRect(0,0,640,640);
+  ctx.clearRect(0,0,W,H);
 
-  // Draw terrain
+  // Draw terrain with pixel art dithering
   for(let y=0;y<MAP_H;y++){
     for(let x=0;x<MAP_W;x++){
-      const t = terrainMap[y][x];
-      ctx.fillStyle = terrColors[t];
-      ctx.fillRect(x*TILE, y*TILE, TILE, TILE);
-      // Grid lines
-      ctx.strokeStyle = 'rgba(0,0,0,.2)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(x*TILE, y*TILE, TILE, TILE);
-      // Terrain icon
-      if(t===1){ ctx.fillStyle='#1a4a0a'; ctx.beginPath(); ctx.arc(x*TILE+TILE/2,y*TILE+TILE/2,8,0,Math.PI*2); ctx.fill(); }
-      if(t===2){ ctx.fillStyle='#5a4a3a'; ctx.fillRect(x*TILE+20,y*TILE+20,40,40); }
-      if(t===3){ ctx.fillStyle='#3a6aaa'; ctx.fillRect(x*TILE,y*TILE,TILE,TILE); }
+      const t=terrainMap[y][x];
+      const tx=x*TILE, ty=y*TILE;
+
+      // Base fill
+      ctx.fillStyle=terrColors[t];
+      ctx.fillRect(tx,ty,TILE,TILE);
+
+      // Pixel dithering / texture
+      if(t===0){ // Plains
+        for(let i=0;i<TILE;i+=8){
+          for(let j=0;j<TILE;j+=8){
+            if((i+j)%16===0){
+              ctx.fillStyle='#4a7a2a'; ctx.fillRect(tx+i,ty+j,4,4);
+            }else if((i+j)%16===12){
+              ctx.fillStyle='#6a9a4a'; ctx.fillRect(tx+i,ty+j,4,4);
+            }
+          }
+        }
+      }else if(t===1){ // Forest
+        ctx.fillStyle='#1a3a0a';
+        ctx.fillRect(tx+8,ty+8,TILE-16,TILE-16);
+        // Tree trunks
+        ctx.fillStyle='#4a3020';
+        ctx.fillRect(tx+24,ty+16,16,20);
+        ctx.fillRect(tx+32,ty+20,12,24);
+        // Canopy
+        ctx.fillStyle='#1a5a0a';
+        ctx.beginPath(); ctx.arc(tx+TILE/2,ty+16,20,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='#2a6a1a';
+        ctx.beginPath(); ctx.arc(tx+TILE/2-4,ty+12,16,0,Math.PI*2); ctx.fill();
+      }else if(t===2){ // Mountain
+        // Rocky shape
+        ctx.fillStyle='#5a4a3a';
+        ctx.beginPath(); ctx.moveTo(tx+4,ty+TILE); ctx.lineTo(tx+4,ty+20); ctx.lineTo(tx+20,ty+8);
+        ctx.lineTo(tx+32,ty+20); ctx.lineTo(tx+44,ty+4); ctx.lineTo(tx+56,ty+16); ctx.lineTo(tx+60,ty+TILE); ctx.fill();
+        ctx.fillStyle='#6a5a4a';
+        ctx.beginPath(); ctx.moveTo(tx+10,ty+TILE); ctx.lineTo(tx+10,ty+28); ctx.lineTo(tx+22,ty+14);
+        ctx.lineTo(tx+34,ty+22); ctx.lineTo(tx+42,ty+8); ctx.lineTo(tx+50,ty+20); ctx.lineTo(tx+54,ty+TILE); ctx.fill();
+        // Snow cap
+        ctx.fillStyle='#e8e8e8';
+        ctx.fillRect(tx+18,ty+6,18,6);
+        ctx.fillRect(tx+38,ty+2,12,6);
+      }else if(t===3){ // Lake
+        // Water with wave effect
+        ctx.fillStyle='#2a5a9a';
+        ctx.fillRect(tx,ty,TILE,TILE);
+        for(let i=0;i<TILE;i+=12){
+          ctx.fillStyle='#3a6aaa';
+          ctx.fillRect(tx+i,ty+(frameCount%12),12,3);
+          ctx.fillStyle='#4a80c0';
+          ctx.fillRect(tx+i+6,ty+(frameCount%12)+6,8,2);
+        }
+      }
+
+      // Grid lines (subtle)
+      ctx.strokeStyle='rgba(0,0,0,.15)';
+      ctx.lineWidth=1;
+      ctx.strokeRect(tx,ty,TILE,TILE);
     }
   }
 
   // Draw move range
-  if(moveRange.length && selectedUnit){
-    for(const m of moveRange){
-      const occ = getUnitAt(m.x,m.y);
-      if(!occ || (occ===selectedUnit)){
-        ctx.fillStyle = 'rgba(0,200,80,.25)';
-        ctx.fillRect(m.x*TILE+2, m.y*TILE+2, TILE-4, TILE-4);
-        ctx.strokeStyle = 'rgba(0,255,100,.5)';
-        ctx.lineWidth=2;
-        ctx.strokeRect(m.x*TILE+2, m.y*TILE+2, TILE-4, TILE-4);
-      }
+  for(const m of moveRange){
+    const mx=m.x*TILE, my=m.y*TILE;
+    if(!getUnitAt(m.x,m.y)||(getUnitAt(m.x,m.y)===selectedUnit)){
+      ctx.fillStyle='rgba(0,220,80,.3)';
+      ctx.fillRect(mx+2,my+2,TILE-4,TILE-4);
+      ctx.strokeStyle='rgba(0,255,100,.6)';
+      ctx.lineWidth=2; ctx.strokeRect(mx+2,my+2,TILE-4,TILE-4);
     }
   }
 
-  // Draw attack targets highlight
+  // Draw attack targets
   for(const t of attackTargets){
-    ctx.strokeStyle='#ff3333';
-    ctx.lineWidth=3;
-    ctx.setLineDash([4,4]);
-    ctx.strokeRect(t.x*TILE+2,t.y*TILE+2,TILE-4,TILE-4);
+    const tx=t.x*TILE, ty=t.y*TILE;
+    ctx.strokeStyle=t._heal?'#44ff44':'#ff3333';
+    ctx.lineWidth=3; ctx.setLineDash([4,4]);
+    ctx.strokeRect(tx+3,ty+3,TILE-6,TILE-6);
     ctx.setLineDash([]);
   }
 
-  // Draw units
+  // Draw units with pixel sprites
   for(const u of units){
     if(u.hp<=0) continue;
-    const ux = u.x*TILE, uy = u.y*TILE;
-    // Body
-    const bodyColors = {
-      'player': u.canHeal ? '#e8e0d0' : (u.isFlying ? '#a0c8f0' : '#6088d8'),
-      'enemy': u.isFlying ? '#d08080' : '#c04040',
-    };
-    ctx.fillStyle = bodyColors[u.team];
-    ctx.fillRect(ux+20, uy+20, 40, 40);
-    // Border
-    ctx.strokeStyle = u.team==='player'?'#3050a0':'#803030';
-    ctx.lineWidth=2;
-    ctx.strokeRect(ux+20, uy+20, 40, 40);
+    const ux=u.x*TILE, uy=u.y*TILE;
+    const spr=getSprite(u);
+    const spriteW=SPRITE_W*SPRITE_SCALE, spriteH=SPRITE_H*SPRITE_SCALE;
+    const sdx=ux+(TILE-spriteW)/2, sdy=uy+8;
 
-    // Flying indicator (wings)
-    if(u.isFlying){
-      ctx.fillStyle='#fff';
-      ctx.beginPath(); ctx.moveTo(ux+10,uy+30); ctx.lineTo(ux+22,uy+20); ctx.lineTo(ux+22,uy+40); ctx.fill();
-      ctx.beginPath(); ctx.moveTo(ux+70,uy+30); ctx.lineTo(ux+58,uy+20); ctx.lineTo(ux+58,uy+40); ctx.fill();
+    // Shadow
+    ctx.fillStyle='rgba(0,0,0,.35)';
+    ctx.beginPath(); ctx.ellipse(ux+TILE/2, uy+TILE-2, spriteW/2-4, 4, 0, 0, Math.PI*2); ctx.fill();
+
+    // Draw sprite
+    if(u.team==='enemy'){
+      drawSpriteFlipped(spr, sdx, sdy, spriteW, spriteH);
+    }else{
+      drawSprite(spr, sdx, sdy, spriteW, spriteH);
     }
-
-    // Icon/initial
-    ctx.fillStyle='#fff';
-    ctx.font='bold 22px sans-serif';
-    ctx.textAlign='center';
-    ctx.fillText(u.cls[0], ux+TILE/2, uy+48);
 
     // HP bar
-    const hpW = 60, hpH = 6, hpX = ux+10, hpY = uy+66;
-    ctx.fillStyle='#333';
-    ctx.fillRect(hpX,hpY,hpW,hpH);
-    const hpPct = u.hp/u.maxHp;
-    const hpColor = hpPct>.5?'#4cff4c':hpPct>.25?'#ffcc00':'#ff3333';
-    ctx.fillStyle=hpColor;
-    ctx.fillRect(hpX,hpY,hpW*hpPct, hpH);
-    ctx.strokeStyle='#000';
-    ctx.lineWidth=1;
-    ctx.strokeRect(hpX,hpY,hpW,hpH);
-    ctx.fillStyle='#fff';
-    ctx.font='bold 9px sans-serif';
-    ctx.fillText(`${u.hp}/${u.maxHp}`, ux+TILE/2, uy+82);
+    const hpW=54, hpH=5, hpX=ux+5, hpY=uy;
+    ctx.fillStyle='#111'; ctx.fillRect(hpX,hpY,hpW,hpH);
+    const hpPct=u.hp/u.maxHp;
+    ctx.fillStyle=hpPct>.5?'#4cff4c':hpPct>.25?'#ffcc00':'#ff3333';
+    ctx.fillRect(hpX,hpY,Math.max(1,hpW*hpPct),hpH);
+    ctx.strokeStyle='#000'; ctx.lineWidth=1; ctx.strokeRect(hpX,hpY,hpW,hpH);
+    ctx.fillStyle='#fff'; ctx.font='bold 8px monospace'; ctx.textAlign='center';
+    ctx.fillText(`${u.hp}/${u.maxHp}`,ux+TILE/2,uy+4+hpH);
 
-    // Name
-    ctx.fillStyle = u.team==='player'?'#c0d8ff':'#ffc0c0';
-    ctx.font='bold 10px "Microsoft YaHei",sans-serif';
-    ctx.fillText(u.name, ux+TILE/2, uy+12);
-
-    // Acted checkmark
+    // Acted check ✓
     if(u.acted){
-      ctx.fillStyle='rgba(0,0,0,.5)';
-      ctx.fillRect(ux+4,uy+4,20,20);
-      ctx.fillStyle='#ffd700';
-      ctx.font='bold 16px sans-serif';
-      ctx.fillText('✓', ux+14, uy+20);
+      ctx.fillStyle='rgba(0,0,0,.6)'; ctx.fillRect(ux+2,uy+30,16,14);
+      ctx.fillStyle='#ffd700'; ctx.font='bold 12px monospace'; ctx.textAlign='center';
+      ctx.fillText('✓',ux+10,uy+42);
     }
 
-    // Selected highlight
+    // Selected glow
     if(u===selectedUnit){
-      ctx.strokeStyle='#ffd700';
-      ctx.lineWidth=3;
-      ctx.strokeRect(ux+2,uy+2,TILE-4,TILE-4);
+      ctx.strokeStyle='#ffd700'; ctx.lineWidth=3; ctx.setLineDash([3,2]);
+      ctx.strokeRect(ux+2,uy+2,TILE-4,TILE-4); ctx.setLineDash([]);
     }
   }
 }
@@ -478,321 +719,172 @@ function render(){
 //  UI
 // ================================================================
 function updateUI(){
-  const turnInd = document.getElementById('turnInd');
-  turnInd.textContent = phase==='player' ? '🔵 玩家回合' : '🔴 敌方回合';
-  turnInd.className = phase;
-
-  const infoDiv = document.getElementById('unitInfo');
+  const ti=document.getElementById('turnInd');
+  ti.textContent=phase==='player'?'🔵 玩家回合':'🔴 敌方回合';
+  ti.className=phase;
+  const info=document.getElementById('unitInfo');
   if(selectedUnit){
-    const u = selectedUnit;
-    const weapDura = `${u.weaponDurability}/${u.maxDura}`;
-    const flyTag = u.isFlying ? ' 🦅飞行' : '';
-    const healTag = u.canHeal ? ' 💚可治疗' : '';
-    infoDiv.innerHTML = `
-      <div class="name">${u.name} [${u.cls}]${flyTag}${healTag}</div>
-      <div class="stat"><span class="label">❤️HP:</span> ${u.hp}/${u.maxHp}</div>
-      <div class="stat"><span class="label">⚔力:</span> ${u.str}</div>
-      <div class="stat"><span class="label">🔮魔:</span> ${u.mag}</div>
-      <div class="stat"><span class="label">🛡防:</span> ${u.def}</div>
-      <div class="stat"><span class="label">✨魔防:</span> ${u.res}</div>
-      <div class="stat"><span class="label">👟移动:</span> ${u.move}</div>
-      <div class="stat"><span class="label">🗡${WEAPON[u.weaponType]}:</span> ${weapDura}</div>
-    `;
-  }else{
-    infoDiv.innerHTML = '<span class="label">选择一个单位查看详情</span>';
-  }
-
-  // Update gold in modal
-  document.getElementById('goldDisplay').textContent = `💰 金币: ${gold} G`;
+    const u=selectedUnit;
+    const tags=[];
+    if(u.isFlying) tags.push('🦅飞行');
+    if(u.canHeal) tags.push('💚治疗');
+    info.innerHTML=`<div class="name">${u.name} [${u.cls}] ${tags.join(' ')}</div>
+      <div class="stat"><span class="label">❤️HP</span> ${u.hp}/${u.maxHp}</div>
+      <div class="stat"><span class="label">⚔力量</span> ${u.str}</div>
+      <div class="stat"><span class="label">🔮魔力</span> ${u.mag}</div>
+      <div class="stat"><span class="label">🛡防御</span> ${u.def}</div>
+      <div class="stat"><span class="label">✨魔防</span> ${u.res}</div>
+      <div class="stat"><span class="label">👟移动</span> ${u.move}</div>
+      <div class="stat"><span class="label">🗡${WEAPON[u.weaponType]}</span> ${u.weaponDurability}/${u.maxDura}</div>`;
+  }else{info.innerHTML='<span class="label">选择单位查看详情</span>';}
+  document.getElementById('goldDisplay').textContent=`💰 金币: ${gold} G`;
   updateRecruitList();
 }
-
-function addLog(msg, cls=''){
+function addLog(msg,cls=''){
   logMessages.push({msg,cls});
   if(logMessages.length>50) logMessages.shift();
-  const box = document.getElementById('logBox');
-  box.innerHTML = logMessages.map(l=>`<div class="${l.cls}">${l.msg}</div>`).join('');
-  box.scrollTop = box.scrollHeight;
+  const box=document.getElementById('logBox');
+  box.innerHTML=logMessages.map(l=>`<div class="${l.cls}">${l.msg}</div>`).join('');
+  box.scrollTop=box.scrollHeight;
 }
 
 // ---- Recruitment ----
-function showRecruitment(){
-  if(gameOver) return;
-  updateRecruitList();
-  document.getElementById('modalOverlay').classList.add('show');
-}
-function hideRecruitment(){
-  document.getElementById('modalOverlay').classList.remove('show');
-  render(); updateUI();
-}
+function showRecruitment(){if(!gameOver){updateRecruitList();document.getElementById('modalOverlay').classList.add('show');}}
+function hideRecruitment(){document.getElementById('modalOverlay').classList.remove('show');render();updateUI();}
 function updateRecruitList(){
-  const list = document.getElementById('recruitList');
-  list.innerHTML = RECRUITS.map((r,i)=>{
-    const canAfford = gold >= r.price;
-    const spawns = findSpawnSpot();
-    const canSpawn = spawns !== null;
+  const list=document.getElementById('recruitList');
+  const spot=findSpawnSpot();
+  list.innerHTML=RECRUITS.map((r,i)=>{
+    const can=gold>=r.price&&spot!==null;
     return `<div class="recruitItem">
       <span class="rName">${r.name}</span>
-      <span class="rStats">${r.cls} | ${WEAPON[r.weaponType]} | HP${r.maxHp} 力${r.str} 魔${r.mag} 防${r.def} 移${r.move}${r.isFlying?' 🦅':''}${r.canHeal?' 💚':''}</span>
+      <span class="rStats">${r.cls} | ${WEAPON[r.weaponType]} | HP${r.maxHp} 力${r.str} 防${r.def} 移${r.move}${r.isFlying?'🦅':''}${r.canHeal?'💚':''}</span>
       <span class="rPrice">${r.price}G</span>
-      <button onclick="recruitUnit(${i})" ${(!canAfford||!canSpawn)?'disabled':''}>${!canSpawn?'无空位':canAfford?'招募':'金币不足'}</button>
-    </div>`;
+      <button onclick="recruitUnit(${i})" ${!can?'disabled':''}>${!spot?'无空位':gold>=r.price?'招募':'金币不足'}</button></div>`;
   }).join('');
 }
 function findSpawnSpot(){
-  // Find empty spot near player units (columns 0-2)
-  for(let x=0;x<3;x++){
-    for(let y=0;y<MAP_H;y++){
-      if(!getUnitAt(x,y) && !isBlocked(x,y,false)){
-        return {x,y};
-      }
-    }
-  }
+  for(let x=0;x<3;x++) for(let y=0;y<MAP_H;y++) if(!getUnitAt(x,y)&&!isBlocked(x,y,false)) return{x,y};
   return null;
 }
 function recruitUnit(idx){
-  const r = RECRUITS[idx];
-  if(gold < r.price) return;
-  const spot = findSpawnSpot();
-  if(!spot) return;
-  gold -= r.price;
-  units.push(makeUnit({...r, team:'player', x:spot.x, y:spot.y}));
-  addLog(`招募 ${r.name}(${r.cls})！花费 ${r.price}G`, 'logInfo');
-  updateRecruitList();
-  render(); updateUI();
-  document.getElementById('goldDisplay').textContent = `💰 金币: ${gold} G`;
+  const r=RECRUITS[idx];
+  if(gold<r.price) return;
+  const spot=findSpawnSpot(); if(!spot) return;
+  gold-=r.price;
+  units.push(makeUnit({...r,team:'player',x:spot.x,y:spot.y}));
+  addLog(`招募 ${r.name}(${r.cls})！花费 ${r.price}G`,'logInfo');
+  updateRecruitList(); render(); updateUI();
 }
 
 // ================================================================
-//  CANVAS CLICK HANDLING
+//  CANVAS CLICK
 // ================================================================
-canvas.addEventListener('click', (e)=>{
+canvas.addEventListener('click',(e)=>{
   if(gameOver||phase==='enemy') return;
-  const rect = canvas.getBoundingClientRect();
-  const scaleX = 640/rect.width, scaleY = 640/rect.height;
-  const mx = (e.clientX-rect.left)*scaleX;
-  const my = (e.clientY-rect.top)*scaleY;
-  const gx = Math.floor(mx/TILE), gy = Math.floor(my/TILE);
+  const rect=canvas.getBoundingClientRect();
+  const sx=W/rect.width, sy=H/rect.height;
+  const mx=(e.clientX-rect.left)*sx, my=(e.clientY-rect.top)*sy;
+  const gx=Math.floor(mx/TILE), gy=Math.floor(my/TILE);
   if(gx<0||gx>=MAP_W||gy<0||gy>=MAP_H) return;
 
-  const clickedUnit = getUnitAt(gx,gy);
-  const clickedInMove = moveRange.find(m=>m.x===gx&&m.y===gy);
-  const clickedAttack = attackTargets.find(t=>t.x===gx&&t.y===gy);
+  const clickedUnit=getUnitAt(gx,gy);
+  const clickedInMove=moveRange.find(m=>m.x===gx&&m.y===gy);
+  const clickedAttack=attackTargets.find(t=>t.x===gx&&t.y===gy);
 
-  // Phase 1: Select unit
   if(!selectedUnit){
-    if(clickedUnit && clickedUnit.team==='player' && !clickedUnit.acted){
-      selectUnit(clickedUnit);
-    }
+    if(clickedUnit&&clickedUnit.team==='player'&&!clickedUnit.acted) selectUnit(clickedUnit);
     return;
   }
 
-  // Phase 2: If in attack mode, handle attack
-  if(attackTargets.length > 0){
-    if(clickedAttack){
-      doAttack(selectedUnit, clickedAttack);
-      return;
-    }
-    // Clicking elsewhere cancels attack mode but keeps movement
-    if(clickedInMove){
-      // Move to new position (cancel attack mode)
-      moveUnit(selectedUnit, gx, gy);
-      attackTargets = [];
-      const newTargets = getAttackTargets(selectedUnit);
-      if(newTargets.length>0){
-        attackTargets = newTargets;
-        addLog(`${selectedUnit.name} 移动完毕，选择攻击目标`, 'logInfo');
-      }else if(getHealTargets(selectedUnit).length>0){
-        attackTargets = getHealTargets(selectedUnit).map(t=>({...t,_heal:true}));
-        addLog(`${selectedUnit.name} 移动完毕，选择治疗目标`, 'logInfo');
-      }else{
-        finishAction(selectedUnit);
-      }
-      render(); updateUI();
-      return;
-    }
-    // Click own unit to cancel
-    if(clickedUnit===selectedUnit){
-      attackTargets=[];
-      selectUnit(selectedUnit);
-      addLog('取消攻击选择', '');
-      return;
-    }
+  if(attackTargets.length>0){
+    if(clickedAttack){doAction(selectedUnit,clickedAttack);return;}
+    if(clickedInMove){moveUnit(selectedUnit,gx,gy);attackTargets=[];postMoveCheck();render();updateUI();return;}
+    if(clickedUnit===selectedUnit){attackTargets=[];selectUnit(selectedUnit);return;}
     return;
   }
 
-  // Phase 3: If in move mode, handle movement
-  if(clickedInMove && !getUnitAt(gx,gy)){
-    moveUnit(selectedUnit, gx, gy);
-    // Check for attack/heal targets after move
-    const atkTargets = getAttackTargets(selectedUnit);
-    if(atkTargets.length>0 && !selectedUnit.canHeal){
-      attackTargets = atkTargets;
-      addLog(`${selectedUnit.name} 移动完毕，选择攻击目标`, 'logInfo');
-    }else if(getHealTargets(selectedUnit).length>0){
-      attackTargets = getHealTargets(selectedUnit).map(t=>({...t,_heal:true}));
-      addLog(`${selectedUnit.name} 移动完毕，选择治疗目标`, 'logInfo');
-    }else{
-      finishAction(selectedUnit);
-    }
-    render(); updateUI();
-    return;
-  }
-
-  // Phase 4: Click different own unit to switch selection
-  if(clickedUnit && clickedUnit.team==='player' && !clickedUnit.acted){
-    selectUnit(clickedUnit);
-    return;
-  }
-
-  // Click empty / enemy outside range → deselect
-  if(!clickedInMove && !clickedAttack){
-    selectedUnit=null; moveRange=[]; attackTargets=[];
-    render(); updateUI();
-  }
+  if(clickedInMove&&!getUnitAt(gx,gy)){moveUnit(selectedUnit,gx,gy);postMoveCheck();render();updateUI();return;}
+  if(clickedUnit&&clickedUnit.team==='player'&&!clickedUnit.acted){selectUnit(clickedUnit);return;}
+  if(!clickedInMove&&!clickedAttack){selectedUnit=null;moveRange=[];attackTargets=[];render();updateUI();}
 });
 
-// ---- Actions ----
 function selectUnit(unit){
-  selectedUnit = unit;
-  moveRange = getMoveRange(unit);
-  attackTargets = [];
-  addLog(`选中 ${unit.name} — 请选择移动位置`, '');
-  render(); updateUI();
+  selectedUnit=unit; moveRange=getMoveRange(unit); attackTargets=[];
+  addLog(`选中 ${unit.name}，请选择移动位置`,''); render(); updateUI();
 }
-
-function moveUnit(unit, gx, gy){
-  unit.x = gx; unit.y = gy;
-  addLog(`${unit.name} 移动到 (${gx},${gy})`, '');
-  moveRange = [];
+function moveUnit(unit, gx, gy){unit.x=gx; unit.y=gy; addLog(`${unit.name} 移动到 (${gx},${gy})`,''); moveRange=[];}
+function postMoveCheck(){
+  const atks=getAttackTargets(selectedUnit);
+  if(atks.length>0&&!selectedUnit.canHeal){attackTargets=atks; addLog(`${selectedUnit.name} 移动完毕，选择攻击目标`,'logInfo');}
+  else if(getHealTargets(selectedUnit).length>0){attackTargets=getHealTargets(selectedUnit).map(t=>({...t,_heal:true})); addLog(`${selectedUnit.name} 移动完毕，选择治疗目标`,'logInfo');}
+  else finishAction(selectedUnit);
 }
-
-function doAttack(attacker, defender){
-  if(defender._heal){
-    // Heal action
-    executeHeal(attacker, defender);
-    finishAction(attacker);
-    if(checkWinLoss()) return;
-    render(); updateUI();
-    return;
-  }
-  executeCombat(attacker, defender);
-  finishAction(attacker);
-  // Clean up dead units
-  units = units.filter(u=>u.hp>0);
-  if(checkWinLoss()) return;
-  render(); updateUI();
+function doAction(attacker,defender){
+  if(defender._heal){executeHeal(attacker,defender);}
+  else executeCombat(attacker,defender);
+  finishAction(attacker); units=units.filter(u=>u.hp>0);
+  if(!checkWinLoss()){render();updateUI();}
 }
-
-function finishAction(unit){
-  unit.acted = true;
-  playerActedSet.add(unit.id);
-  selectedUnit = null;
-  moveRange = [];
-  attackTargets = [];
-  addLog(`${unit.name} 行动完毕`, '');
-  render(); updateUI();
-}
+function finishAction(unit){unit.acted=true;selectedUnit=null;moveRange=[];attackTargets=[];addLog(`${unit.name} 行动完毕`,'');render();updateUI();}
 
 // ================================================================
-//  END TURN
+//  END TURN & ENEMY AI
 // ================================================================
+let frameCount=0;
 function endTurn(){
   if(gameOver||phase==='enemy') return;
-  // Force finish current selection
-  if(selectedUnit){
-    selectedUnit.acted = true;
-    playerActedSet.add(selectedUnit.id);
-    selectedUnit = null;
-    moveRange = [];
-    attackTargets = [];
-  }
-  // Reset all player act status for next turn (but keep acted flags until enemy turn ends)
-  phase = 'enemy';
-  addLog('⚔ 敌方回合开始...', 'logInfo');
-  updateUI(); render();
-  runEnemyAI();
+  if(selectedUnit){selectedUnit.acted=true;selectedUnit=null;moveRange=[];attackTargets=[];}
+  phase='enemy'; addLog('⚔ 敌方回合开始...','logInfo'); updateUI(); render(); runEnemyAI();
 }
-
-// ---- Enemy AI ----
 async function runEnemyAI(){
-  const enemyUnits = units.filter(u=>u.team==='enemy'&&u.hp>0).sort(()=>Math.random()-.5);
-  for(const enemy of enemyUnits){
+  const enemies=units.filter(u=>u.team==='enemy'&&u.hp>0).sort(()=>Math.random()-.5);
+  for(const enemy of enemies){
     if(gameOver) return;
-    await sleep(450);
+    await sleep(420);
     if(enemy.hp<=0) continue;
+    const players=units.filter(u=>u.team==='player'&&u.hp>0);
+    if(players.length===0) return;
+    let nearest=players[0], minDist=Math.abs(enemy.x-nearest.x)+Math.abs(enemy.y-nearest.y);
+    for(const p of players){const d=Math.abs(enemy.x-p.x)+Math.abs(enemy.y-p.y);if(d<minDist){minDist=d;nearest=p;}}
 
-    // Find nearest player unit
-    const playerUnits = units.filter(u=>u.team==='player'&&u.hp>0);
-    if(playerUnits.length===0) return;
-    let nearest = playerUnits[0];
-    let minDist = Math.abs(enemy.x-nearest.x)+Math.abs(enemy.y-nearest.y);
-    for(const p of playerUnits){
-      const d = Math.abs(enemy.x-p.x)+Math.abs(enemy.y-p.y);
-      if(d < minDist){ minDist=d; nearest=p; }
+    const atks=getAttackTargets(enemy);
+    const adj=atks.filter(t=>Math.abs(t.x-enemy.x)+Math.abs(t.y-enemy.y)===1);
+    if(adj.length>0&&enemy.weaponDurability>0&&!enemy.canHeal){
+      const target=adj.sort((a,b)=>a.hp-b.hp)[0];
+      executeCombat(enemy,target); units=units.filter(u=>u.hp>0);
+      if(checkWinLoss()){render();updateUI();return;}
+      render();updateUI(); continue;
     }
 
-    // Check if adjacent → attack
-    const atkTargets = getAttackTargets(enemy);
-    const adj = atkTargets.find(t=>Math.abs(t.x-enemy.x)+Math.abs(t.y-enemy.y)===1);
-    if(adj && enemy.weaponDurability>0 && !enemy.canHeal){
-      // Prioritize lowest HP target among adjacent
-      const adjTargets = atkTargets.filter(t=>Math.abs(t.x-enemy.x)+Math.abs(t.y-enemy.y)===1);
-      const target = adjTargets.sort((a,b)=>a.hp-b.hp)[0];
-      executeCombat(enemy, target);
-      units = units.filter(u=>u.hp>0);
-      if(checkWinLoss()){ render(); updateUI(); return; }
-      enemy.acted = true;
-      render(); updateUI();
-      continue;
-    }
+    const range=getMoveRange(enemy);
+    const valid=range.filter(m=>{const occ=getUnitAt(m.x,m.y);return!occ||occ===enemy;});
+    let bestMove={x:enemy.x,y:enemy.y}, bestDist=minDist;
+    for(const m of valid){const d=Math.abs(m.x-nearest.x)+Math.abs(m.y-nearest.y);if(d<bestDist){bestDist=d;bestMove=m;}}
+    enemy.x=bestMove.x; enemy.y=bestMove.y;
 
-    // Move toward nearest player
-    const range = getMoveRange(enemy);
-    // Filter out enemy-occupied and player-occupied squares
-    const validMoves = range.filter(m=>{
-      const occ = getUnitAt(m.x,m.y);
-      return !occ || occ===enemy;
-    });
-    // Find move that minimizes distance to nearest player
-    let bestMove = {x:enemy.x, y:enemy.y};
-    let bestDist = minDist;
-    for(const m of validMoves){
-      const d = Math.abs(m.x-nearest.x)+Math.abs(m.y-nearest.y);
-      if(d < bestDist){ bestDist=d; bestMove=m; }
+    const postAtks=getAttackTargets(enemy);
+    const postAdj=postAtks.filter(t=>Math.abs(t.x-enemy.x)+Math.abs(t.y-enemy.y)===1);
+    if(postAdj.length>0&&enemy.weaponDurability>0&&!enemy.canHeal){
+      const target=postAdj.sort((a,b)=>a.hp-b.hp)[0];
+      executeCombat(enemy,target); units=units.filter(u=>u.hp>0);
+      if(checkWinLoss()){render();updateUI();return;}
     }
-    // Move
-    enemy.x = bestMove.x; enemy.y = bestMove.y;
-
-    // After move, check adjacent again
-    const postTargets = getAttackTargets(enemy);
-    const postAdj = postTargets.filter(t=>Math.abs(t.x-enemy.x)+Math.abs(t.y-enemy.y)===1);
-    if(postAdj.length>0 && enemy.weaponDurability>0 && !enemy.canHeal){
-      const target = postAdj.sort((a,b)=>a.hp-b.hp)[0];
-      executeCombat(enemy, target);
-      units = units.filter(u=>u.hp>0);
-      if(checkWinLoss()){ render(); updateUI(); return; }
-    }
-    enemy.acted = true;
-    render(); updateUI();
+    render();updateUI();
   }
-
-  // End enemy turn
-  // Reset all acted flags
-  units.forEach(u=>{ u.acted = false; });
-  playerActedSet = new Set();
-  phase = 'player';
-  addLog('🔵 玩家回合', 'logInfo');
-  updateUI(); render();
+  units.forEach(u=>{u.acted=false;});
+  phase='player'; addLog('🔵 玩家回合','logInfo'); updateUI(); render();
 }
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 
-function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+// ---- Animation loop (for water animation) ----
+function animLoop(){frameCount++;render();requestAnimationFrame(animLoop);}
 
 // ================================================================
 //  INIT
 // ================================================================
 resetGame();
+animLoop();
 </script>
-<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}</script>
 </body>
 </html>
